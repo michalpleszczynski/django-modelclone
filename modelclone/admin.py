@@ -20,6 +20,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.db.models.fields.files import FieldFile, FileField
 
+from .utils import camel_to_snake
+
 
 __all__ = 'ClonableModelAdmin',
 
@@ -109,7 +111,7 @@ class ClonableModelAdmin(ModelAdmin):
                     prefix = "%s-%s" % (prefix, prefixes[prefix])
 
                 request_files = request.FILES
-                filter_params = {'%s__pk' % original_obj.__class__.__name__.lower(): original_obj.pk}
+                filter_params = {'%s__pk' % camel_to_snake(original_obj.__class__.__name__): original_obj.pk}
                 inlined_objs = inline.model.objects.filter(**filter_params)
                 for n, inlined_obj in enumerate(inlined_objs.all()):
                     for field in inlined_obj._meta.fields:
@@ -240,6 +242,7 @@ class ClonableModelAdmin(ModelAdmin):
         This method returns the modified ``fields_list``.
         """
         return fields_list
+
 
 class InlineAdminFormSetFakeOriginal(helpers.InlineAdminFormSet):
 
